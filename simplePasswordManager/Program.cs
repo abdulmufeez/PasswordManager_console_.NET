@@ -14,7 +14,7 @@ namespace simplePasswordManager
             var connString = "Host=localhost;Port=5432;Username=postgres;Password=manjan;Database=passwordManager";
 
             MethodClass methodClass = new MethodClass(connString);
-            methodClass.psswrdManager();
+            methodClass.PsswrdManager();
         }        
     }
 }

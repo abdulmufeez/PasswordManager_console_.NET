@@ -8,17 +8,17 @@ namespace simplePasswordManager.ClassLibrary
 {
     class MethodClass
     {
-        protected NpgsqlConnection npgsqlConnection;
-        protected string username { get; set; }
+        protected NpgsqlConnection npgsqlConnection;        //declaring NPGSQL class
+        protected string username { get; set; }     //saving in order to use later!
         protected string password { get; set; }
 
         public MethodClass(string connstring)
         {
-            npgsqlConnection = new NpgsqlConnection(connstring);
+            npgsqlConnection = new NpgsqlConnection(connstring);    //intializing class in default const
         }
         public void LoginMethod()
         {
-            bool flag = false;
+            bool flag = false;          // this is used for accuracy in transaction of psql query
             do
             {
                 Console.Write("Enter username for superuser ");
@@ -27,7 +27,7 @@ namespace simplePasswordManager.ClassLibrary
                 Console.Write("Enter password ");
                 Console.Write(":");
                 password = Console.ReadLine().ToLower();
-                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+                if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))     //check if user provide empty string
                 {
                     try
                     {
@@ -42,8 +42,8 @@ namespace simplePasswordManager.ClassLibrary
                             npgsqlDataAdapter.Dispose();
                             if (dataTable.Rows.Count > 0 && dataTable.Rows.Count <= 1)
                             {
-                                flag = true;
-                            }
+                                flag = true;        //if user entered correct data it will give an true result 
+                            }                       //by giving only one row in database table
                             else
                             {
                                 flag = false;
@@ -66,7 +66,7 @@ namespace simplePasswordManager.ClassLibrary
             } while (flag == false);
             
         }
-        public void psswrdManager()
+        public void PsswrdManager()     //whole password manager functions lies here
         {
             Console.WriteLine("1. Sign in! \n" +
                                 "2. Sign up!");
@@ -77,32 +77,33 @@ namespace simplePasswordManager.ClassLibrary
                 case 1:
                     {
                         LoginMethod();
-                        var option = menuMethod();
+                        var option = MenuMethod();
                         switch (option)
                         {
                             case "1":
                                 {
-                                    passwordstoreMethod();
+                                    PasswordStore();
                                     break;
                                 }
                             case "2":
                                 {
-                                    findPassword();
+                                    FindPassword();
                                     break;
                                 }
                             case "3":
                                 {
-                                    findSites();
+                                    FindSites();
                                     break;
                                 }
                             default:
+                                Console.WriteLine("Invalid Input");
                                 break;
                         }
                         break;
                     }                 
                 case 2:
                     {
-                        signupMethod();
+                        SignupMethod();
                         Console.WriteLine("Do You want to login in ? \n" +
                             "1. yes \n" +
                             "2. no");
@@ -111,32 +112,33 @@ namespace simplePasswordManager.ClassLibrary
                         if (count == "1")
                         {
                             LoginMethod();
-                            var option = menuMethod();
+                            var option = MenuMethod();
                             switch (option)
                             {
                                 case "1":
                                     {
-                                        passwordstoreMethod();
+                                        PasswordStore();
                                         break;
                                     }
                                 case "2":
                                     {
-                                        findPassword();
+                                        FindPassword();
                                         break;
                                     }
                                 case "3":
                                     {
-                                        findSites();
+                                        FindSites();
                                         break;
                                     }
                                 default:
+                                    Console.WriteLine("Invalid Input");
                                     break;
                             }
                             break;
                         }
                         else
                         {
-                            Environment.Exit(0);
+                            Environment.Exit(0);     // for exiting current working
                         }
                         break;
                     }
@@ -147,12 +149,12 @@ namespace simplePasswordManager.ClassLibrary
                     }                    
             }           
         }
-        public string menuMethod()
+        public string MenuMethod()      //this just is used for rturning several menu function input
         {
             string choice = null;
             Console.Clear();
             Console.WriteLine("you are now Signed In!");
-            Console.WriteLine("User id: " + requestUsernameid());
+            Console.WriteLine("User id: " + RequestUsernameid());
             Console.WriteLine("Username: " + username);
             Console.WriteLine("Press \n" +
                 "1. If do you want to store a new password for any app or website \n" +
@@ -167,9 +169,9 @@ namespace simplePasswordManager.ClassLibrary
             }            
             return choice;
         }
-        public void signupMethod()
+        public void SignupMethod()      //used to register a new user
         {
-            bool flag = false;
+            bool flag = false;          //initilize for checking whole method working
             do
             {
                 Console.Write("Enter username");
@@ -188,17 +190,17 @@ namespace simplePasswordManager.ClassLibrary
                 if (!string.IsNullOrEmpty(username1) && !string.IsNullOrEmpty(password1) 
                     && !string.IsNullOrEmpty(confirmPassword) && !string.IsNullOrEmpty(email))
                 {
-                    if (password == confirmPassword)
+                    if (password == confirmPassword)    //confirming password
                     {
-                        try
+                        try     //it is best practice to db query in try catch block
                         {
                             var psqlquery = "INSERT INTO  superuser (user_name,password,email) " +
                                                     "Values('" + username + "',crypt('"+ password +"',gen_salt('bf')),'" + email + "')";
-                            NpgsqlCommand npgsqlCommand = new NpgsqlCommand(psqlquery, npgsqlConnection);
-                            npgsqlConnection.Open();
-                            npgsqlCommand.ExecuteScalar();
-                            flag = true;
-                            npgsqlConnection.Close();
+                            NpgsqlCommand npgsqlCommand = new NpgsqlCommand(psqlquery, npgsqlConnection);   //saving query with db connection
+                            npgsqlConnection.Open();    //opening connection
+                            npgsqlCommand.ExecuteScalar();      //executing db query but not returning any result
+                            flag = true;                        //returning condition true if everythig works fine
+                            npgsqlConnection.Close();  //closing connection
 
                         }
                         catch (NpgsqlException error)
@@ -216,7 +218,7 @@ namespace simplePasswordManager.ClassLibrary
                 }
             } while (flag == false);
         }
-        public void passwordstoreMethod()
+        public void PasswordStore()     //storing password of any web or app for a specific user
         {
             bool flag = false;
             do
@@ -246,12 +248,12 @@ namespace simplePasswordManager.ClassLibrary
                         if (!string.IsNullOrEmpty(email) && !string.IsNullOrEmpty(url))
                         {
                             psqlquery = "INSERT INTO users_data(website,user_name,password,email,url,superuser_id)" +
-                                "VALUES('" + website_name + "','" + username2 + "','" + password2 + "','" + email + "','" + url + "','" + requestUsernameid() + "');";                            
+                                "VALUES('" + website_name + "','" + username2 + "','" + password2 + "','" + email + "','" + url + "','" + RequestUsernameid() + "');";                            
                         }
                         else
                         {
                             psqlquery = "INSERT INTO users_data(website,user_name,password,superuser_id)" +
-                                "VALUES('" + website_name + "','" + username2 + "','" + password2 + "','" + requestUsernameid() + "');";                            
+                                "VALUES('" + website_name + "','" + username2 + "','" + password2 + "','" + RequestUsernameid() + "');";                            
                         }
                         NpgsqlCommand npgsqlCommand = new NpgsqlCommand(psqlquery, npgsqlConnection);
                         npgsqlConnection.Open();
@@ -272,8 +274,8 @@ namespace simplePasswordManager.ClassLibrary
                     flag = false;
                 }
             } while (flag == false);
-        }
-        public int requestUsernameid()
+        }       
+        public int RequestUsernameid()
         {
             var id = 0;
             try
@@ -288,7 +290,7 @@ namespace simplePasswordManager.ClassLibrary
                     {
                         while (reader.Read())       //reading in lope that is one by one
                         {
-                            id = Convert.ToInt32(reader[0]);        //saving in variable                     
+                            id = Convert.ToInt32(reader[0]);        //saving result in variable                     
                         }
                     }
                     npgsqlConnection.Close();
@@ -300,13 +302,13 @@ namespace simplePasswordManager.ClassLibrary
             }
             return id;      //finally return user id 
         }
-        public int requestingRowNumber(string webname)
+        public int RequestingRowNumber(string webname)
         {
             var id = 0;
             try
             {
                 var query = "SELECT count(*) FROM users_data " +
-                            "WHERE website = '" + webname + "' AND superuser_id = " + requestUsernameid() + ";";
+                            "WHERE website = '" + webname + "' AND superuser_id = " + RequestUsernameid() + ";";
                 NpgsqlCommand npgsqlCommand = new NpgsqlCommand(query, npgsqlConnection);
                 using (npgsqlCommand)
                 {
@@ -316,7 +318,7 @@ namespace simplePasswordManager.ClassLibrary
                     {
                         while (reader.Read())       //reading in lope that is one by one
                         {
-                            id = Convert.ToInt32(reader[0]);        //saving in variable                     
+                            id = Convert.ToInt32(reader[0]);        //saving result in variable                     
                         }
                     }
                     npgsqlConnection.Close();
@@ -328,7 +330,7 @@ namespace simplePasswordManager.ClassLibrary
             }
             return id;      //finally return user id 
         }
-        public void findPassword()
+        public void FindPassword()      //finding password of any web or app for a specific user
         {
             Console.WriteLine("Enter name of app or website ");
             Console.Write(": ");
@@ -341,12 +343,12 @@ namespace simplePasswordManager.ClassLibrary
                     try
                     {
                         var psqlquery = "SELECT user_name ,password ,email FROM users_data " +
-                            "WHERE website = '" + webname + "' AND superuser_id = " + requestUsernameid() + ";";
+                            "WHERE website = '" + webname + "' AND superuser_id = " + RequestUsernameid() + ";";
                         NpgsqlDataAdapter npgsqlDataAdapter = new NpgsqlDataAdapter(psqlquery, npgsqlConnection);
                         using (npgsqlDataAdapter)        //running in like a loop
                         {
-                            DataTable dataTable = new DataTable();          //Creating table same as in Mysql
-                            npgsqlDataAdapter.Fill(dataTable);               //filling table with mysql data
+                            DataTable dataTable = new DataTable();          //Creating table same as present in psql
+                            npgsqlDataAdapter.Fill(dataTable);               //filling csharp table from psql result data
                             npgsqlDataAdapter.Dispose();                     //disposig adapter means closing connection
                             flag = true;
 
@@ -361,7 +363,7 @@ namespace simplePasswordManager.ClassLibrary
 
                             //==========================================
 
-                            Console.WriteLine(DataTableToCsv(dataTable));
+                            Console.WriteLine(DataTableToCsv(dataTable));   //printing on console screen 
 
                             //=========================================
 
@@ -413,13 +415,13 @@ namespace simplePasswordManager.ClassLibrary
                     flag = false;
                 }
             } while (flag == false);            
-        }
-        public void findSites()
+        }   
+        public void FindSites()         //finding website or app associate with given username
         {
             try
             {
                 var psqlquery = "SELECT website, user_name FROM users_data " +
-                    "WHERE superuser_id = " + requestUsernameid() + ";";
+                    "WHERE superuser_id = " + RequestUsernameid() + ";";
                 NpgsqlDataAdapter npgsqlDataAdapter = new NpgsqlDataAdapter(psqlquery, npgsqlConnection);
                 using (npgsqlDataAdapter)        //running in like a loop
                 {
@@ -434,10 +436,10 @@ namespace simplePasswordManager.ClassLibrary
             {
                 Console.WriteLine(error.ToString());                
             }
-        }
+        }       
 
-        public static string DataTableToCsv(DataTable table)
-        {
+        public static string DataTableToCsv(DataTable table)    //i copy this method from stackoverflow which basically used 
+        {                                                       //fpr printing db query result in console in the form of just like table
             string result = string.Empty;
             StringBuilder resultBuilder = new StringBuilder();
 
@@ -482,6 +484,6 @@ namespace simplePasswordManager.ClassLibrary
             }
 
             return result;
-        }
+        }   
     }
 }

@@ -190,12 +190,12 @@ namespace simplePasswordManager.ClassLibrary
                 if (!string.IsNullOrEmpty(username1) && !string.IsNullOrEmpty(password1) 
                     && !string.IsNullOrEmpty(confirmPassword) && !string.IsNullOrEmpty(email))
                 {
-                    if (password == confirmPassword)    //confirming password
+                    if (password1 == confirmPassword)    //confirming password
                     {
                         try     //it is best practice to db query in try catch block
                         {
                             var psqlquery = "INSERT INTO  superuser (user_name,password,email) " +
-                                                    "Values('" + username + "',crypt('"+ password +"',gen_salt('bf')),'" + email + "')";
+                                                    "Values('" + username1 + "',crypt('"+ password1 +"',gen_salt('bf')),'" + email + "')";
                             NpgsqlCommand npgsqlCommand = new NpgsqlCommand(psqlquery, npgsqlConnection);   //saving query with db connection
                             npgsqlConnection.Open();    //opening connection
                             npgsqlCommand.ExecuteScalar();      //executing db query but not returning any result
